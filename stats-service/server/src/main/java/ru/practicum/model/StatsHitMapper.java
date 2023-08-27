@@ -4,12 +4,12 @@ import ru.practicum.dto.StatsHitDto;
 
 public class StatsHitMapper {
 
-    public static StatHit StatsDtoToStatHit(StatsHitDto statsDto) {
+    public static StatHit statsHitDtoToStatHit(StatsHitDto statsHitDto) {
         return StatHit.builder()
-                .app(statsDto.getApp())
-                .uri(statsDto.getUri())
-                .ip(statsDto.getIp())
-                .timestamp(statsDto.getTimestamp())
+                .app(statsHitDto.getApp())
+                .uri(statsHitDto.getUri())
+                .ip(statsHitDto.getIp())
+                .timestamp(statsHitDto.getTimestamp())
                 .build();
     }
 

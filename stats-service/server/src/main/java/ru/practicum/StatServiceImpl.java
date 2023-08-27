@@ -23,7 +23,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public void saveStat(StatsHitDto dto) {
-        StatHit statHit = repository.save(StatsHitMapper.StatsDtoToStatHit(dto));
+        StatHit statHit = repository.save(StatsHitMapper.statsHitDtoToStatHit(dto));
         log.info("Save stat {}", statHit);
     }
 

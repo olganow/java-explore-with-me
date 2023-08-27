@@ -1,11 +1,12 @@
 #!/bin/bash
-cd main-service
+
+cd ewm-service
 rm -fr target
 mvn clean package
 
 cd ..
 
-cd  stat-service
+cd  stats-service
 rm -fr target
 mvn clean package
 

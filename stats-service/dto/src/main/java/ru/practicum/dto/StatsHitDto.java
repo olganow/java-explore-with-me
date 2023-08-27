@@ -16,7 +16,7 @@ import static ru.practicum.dto.Constant.DATE_TIME_PATTERN;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StatsDto {
+public class StatsHitDto {
 
     @NotBlank(message = "App can't be blank")
     private String app;

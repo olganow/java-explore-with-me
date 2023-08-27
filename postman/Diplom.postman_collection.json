@@ -120,7 +120,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -158,7 +158,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -196,7 +196,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -267,7 +267,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -305,7 +305,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -343,7 +343,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],
@@ -381,7 +381,7 @@
 									"    var jsonData = pm.response.json();",
 									"",
 									"    pm.expect(jsonData).to.have.property('error');",
-									"    pm.expect(jsonData.error).to.eql('Ошибка валидации');",
+									"    pm.expect(jsonData.error).to.eql('Validation Error');",
 									"",
 									"});"
 								],

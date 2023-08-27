@@ -1,11 +1,10 @@
 package ru.practicum.model;
 
-import ru.practicum.dto.StatsDto;
+import ru.practicum.dto.StatsHitDto;
 
 public class StatsHitMapper {
 
-
-    public static StatHit StatsDtoToStats(StatsDto statsDto) {
+    public static StatHit StatsDtoToStatHit(StatsHitDto statsDto) {
         return StatHit.builder()
                 .app(statsDto.getApp())
                 .uri(statsDto.getUri())

@@ -1,11 +1,13 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.practicum.dto.StatsDto;
+import ru.practicum.dto.StatsHitDto;
 import ru.practicum.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
@@ -23,12 +25,12 @@ public class StatsClient {
     }
 
     public void saveStats(String app, String uri, String ip, LocalDateTime timestamp) {
-        final StatsDto endpointHit = new StatsDto(app, uri, ip, timestamp);
+        final StatsHitDto endpointHit = new StatsHitDto(app, uri, ip, timestamp);
         log.info("Save stats {}", endpointHit);
         this.client.post()
                 .uri("/hit")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(endpointHit, StatsDto.class)
+                .body(endpointHit, StatsHitDto.class)
                 .retrieve()
                 .toBodilessEntity()
                 .block();

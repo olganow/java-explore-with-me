@@ -28,26 +28,28 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean isUnique) {
         if (start.isAfter(end)) {
             log.error("End time can't be before start time");
             throw new ValidationException("End time can't be before start time");
         }
 
-        if (isUnique && uris != null) {
-            log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-            return repository.getStatsByUrisByUniqueIp(start, end, uris);
-        } else if (isUnique) {
-            log.error("Get all stats with isUnique {} ", isUnique);
-            return repository.getStatsByUniqueIp(start, end);
-        } else if (uris != null) {
-            log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-            return repository.getAllStatsByUris(start, end, uris);
+        if (uris.isEmpty()) {
+            if (isUnique) {
+                log.error("Get all stats with isUnique {} ", isUnique);
+                return repository.getStatsByUniqueIp(start, end);
+            } else {
+                log.error("Get all stats with isUnique {} ", isUnique);
+                return repository.getAllStats(start, end);
+            }
         } else {
-            log.error("Get all stats with isUnique {} ", isUnique);
-            return repository.getAllStats(start, end);
+            if (isUnique) {
+                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+                return repository.getStatsByUrisByUniqueIp(start, end, uris);
+            } else {
+                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+                return repository.getAllStatsByUris(start, end, uris);
+            }
         }
-
     }
 }

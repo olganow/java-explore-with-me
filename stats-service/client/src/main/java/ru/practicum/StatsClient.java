@@ -1,6 +1,8 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,12 @@ import java.util.List;
 
 @Service
 @Slf4j
+@PropertySource(value = {"classpath:statsServiceClient.properties"})
 public class StatsClient {
 
-    private String baseUrl = "http://localhost:9090";
+    @Value("${stats.server.url}")
+    private String baseUrl;
+
     private final WebClient client;
 
     public StatsClient() {

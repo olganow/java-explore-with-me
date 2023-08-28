@@ -2,14 +2,12 @@ package ru.practicum;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.model.StatHit;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface StatRepository extends JpaRepository<StatHit, Integer> {
     @Query("select new ru.practicum.dto.ViewStatsDto(s.app, s.uri, count(distinct s.ip))" +
             "from StatHit as s " +

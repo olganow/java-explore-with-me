@@ -35,22 +35,19 @@ public class StatServiceImpl implements StatService {
             throw new ValidationException("End time can't be before start time");
         }
 
-        if (uris.isEmpty()) {
-            if (isUnique) {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-                return repository.getStatsByUniqueIp(start, end);
-            } else {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-                return repository.getAllStats(start, end);
-            }
+        if (isUnique && uris != null) {
+            log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+            return repository.getAllStatsByUris(start, end, uris);
+        } else if (isUnique) {
+            log.error("Get all stats with isUnique {} ", isUnique);
+            return repository.getStatsByUniqueIp(start, end);
+        } else if (uris != null) {
+            log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+            return repository.getStatsByUrisByUniqueIp(start, end, uris);
         } else {
-            if (isUnique) {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-                return repository.getStatsByUrisByUniqueIp(start, end, uris);
-            } else {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
-                return repository.getAllStatsByUris(start, end, uris);
-            }
+            log.error("Get all stats with isUnique {} ", isUnique);
+            return repository.getAllStats(start, end);
         }
+
     }
 }

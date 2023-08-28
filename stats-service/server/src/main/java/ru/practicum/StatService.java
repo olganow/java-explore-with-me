@@ -11,5 +11,5 @@ public interface StatService {
 
     void saveStat(StatsHitDto statsHitDto);
 
-    Collection<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean isUnique);
+    Collection<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
 }

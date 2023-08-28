@@ -28,26 +28,26 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean isUnique) {
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (start.isAfter(end)) {
             log.error("End time can't be before start time");
             throw new ValidationException("End time can't be before start time");
         }
 
         if (uris.isEmpty()) {
-            if (isUnique) {
-                log.error("Get all stats with isUnique {} ", isUnique);
+            if (unique) {
+                log.error("Get all stats with isUnique {} ", unique);
                 return repository.getStatsByUniqueIp(start, end);
             } else {
-                log.error("Get all stats with isUnique {} ", isUnique);
+                log.error("Get all stats with isUnique {} ", unique);
                 return repository.getAllStats(start, end);
             }
         } else {
-            if (isUnique) {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+            if (unique) {
+                log.error("Get all stats with isUnique {} when uris {} ", unique, uris);
                 return repository.getStatsByUrisByUniqueIp(start, end, uris);
             } else {
-                log.error("Get all stats with isUnique {} when uris {} ", isUnique, uris);
+                log.error("Get all stats with isUnique {} when uris {} ", unique, uris);
                 return repository.getAllStatsByUris(start, end, uris);
             }
         }

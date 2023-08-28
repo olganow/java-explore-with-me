@@ -34,9 +34,9 @@ public class StatController {
             @RequestParam(value = "start") @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime start,
             @RequestParam(value = "end") @DateTimeFormat(pattern = DATE_TIME_PATTERN) LocalDateTime end,
             @RequestParam(value = "uris", defaultValue = "") List<String> uris,
-            @RequestParam(value = "isUnique", defaultValue = "false") Boolean isUnique
+            @RequestParam(value = "unique", defaultValue = "false") Boolean unique
     ) {
-        log.info("Get viewed stats with startDate {} endDate {}, uris {} isUnique {}", start, end, uris, isUnique);
-        return service.getStats(start, end, uris, isUnique);
+        log.info("Get viewed stats with startDate {} endDate {}, uris {} unique {}", start, end, uris, unique);
+        return service.getStats(start, end, uris, unique);
     }
 }

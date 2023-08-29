@@ -1,2 +1,3 @@
-# java-explore-with-me
-Template repository for ExploreWithMe project.
+# Java-explore-with-me project
+ExploreWithMe project  — афиша. В этой афише можно предложить какое-либо событие от выставки до похода в кино и собрать
+компанию для участия в нём.

@@ -3,6 +3,8 @@ package ru.practicum.users.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -18,10 +20,10 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "email", length = 256)
+    @Column(name = "email", length = 254)
     @EqualsAndHashCode.Include
     private String email;
 
-    @Column(name = "name",  length = 32)
+    @Column(name = "name",  length = 250)
     private String name;
 }

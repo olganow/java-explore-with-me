@@ -3,8 +3,6 @@ package ru.practicum.users.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 

@@ -16,6 +16,6 @@ public class CategoryDto {
     private Long id;
 
     @NotBlank(message = "Name can't be blank")
-    @Size(max = 32)
+    @Size(min = 1, max = 50)
     private String name;
 }

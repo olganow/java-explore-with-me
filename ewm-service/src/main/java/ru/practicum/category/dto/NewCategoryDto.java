@@ -14,6 +14,6 @@ import javax.validation.constraints.Size;
 public class NewCategoryDto {
 
     @NotBlank(message = "Name can't be blank")
-    @Size(max = 32)
+    @Size(min = 1, max = 50)
     String name;
 }

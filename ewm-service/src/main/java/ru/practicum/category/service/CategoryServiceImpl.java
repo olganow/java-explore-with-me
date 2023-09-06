@@ -9,10 +9,10 @@ import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.CategoryMapper;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.model.Category;
-import ru.practicum.category.repository.CategoryRepository;
-import ru.practicum.handler.NotFoundException;
 import ru.practicum.handler.ValidateDateException;
 import ru.practicum.util.Pagination;
+import ru.practicum.category.repository.CategoryRepository;
+import ru.practicum.handler.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,15 +20,15 @@ import java.util.stream.Collectors;
 import static ru.practicum.category.dto.CategoryMapper.toCategory;
 import static ru.practicum.category.dto.CategoryMapper.toCategoryDto;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    @Transactional
     @Override
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
         Category category = categoryRepository.save(toCategory(newCategoryDto));
@@ -44,7 +44,6 @@ public class CategoryServiceImpl implements CategoryService {
         return toCategoryDto(category);
     }
 
-    @Transactional
     @Override
     public CategoryDto updateCategoryById(Long id, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(id)
@@ -54,6 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         return toCategoryDto(categoryRepository.save(category));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<CategoryDto> getCategory(int from, int size) {
         log.info("Get categories");
@@ -62,7 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
     public void deleteCategoryById(Long id) {
         categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Category with id=" + id + " hasn't found"));

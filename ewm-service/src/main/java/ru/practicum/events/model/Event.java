@@ -1,6 +1,10 @@
 package ru.practicum.events.model;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.category.model.Category;
 import ru.practicum.util.enam.EventState;
@@ -9,8 +13,8 @@ import ru.practicum.users.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static ru.practicum.util.enam.EventState.PENDING;
 import static ru.practicum.util.Constants.DATE_DEFAULT;
+import static ru.practicum.util.enam.EventState.PENDING;
 
 @Entity
 @Table(name = "events")
@@ -18,25 +22,26 @@ import static ru.practicum.util.Constants.DATE_DEFAULT;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@DynamicUpdate
 public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(updatable = false)
     private Long id;
 
-    @Column(length = 128, nullable = false)
+    @Column(nullable = false, length = 120)
     private String title;
 
-    @Column(length = 512, nullable = false)
+    @Column(nullable = false, length = 2000)
     private String annotation;
-
-    @Column(length = 2048, nullable = false)
-    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Column(nullable = false, length = 7000)
+    private String description;
 
     @Column(name = "event_date", nullable = false)
     @DateTimeFormat(pattern = DATE_DEFAULT)
@@ -52,7 +57,6 @@ public class Event {
     private Boolean paid;
 
     @Column(name = "participant_limit", nullable = false)
-
     private Integer participantLimit;
 
     @Column(name = "confirmed_requests")
@@ -66,7 +70,7 @@ public class Event {
     private User initiator;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 256, nullable = false)
+    @Column(name = "state", nullable = false)
     private EventState state = PENDING;
 
     @Column(name = "created_on", nullable = false)

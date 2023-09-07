@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
-import ru.practicum.util.enam.SortEvents;
+import ru.practicum.util.enam.EventsSort;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +55,8 @@ public class EventPublicController {
                                                      @Positive Integer size,
                                                      HttpServletRequest request
     ) {
-        SortEvents sortParam = SortEvents.from(sort).orElseThrow(() -> new ValidationException("Sort isn't valid: " + sort));
+        EventsSort sortParam = EventsSort.from(sort).orElseThrow(() -> new ValidationException("Sort isn't valid: "
+                + sort));
 
         log.info("Get public events with text {}, categories {} onlyAvailable {}, sort {}", text, categories,
                 onlyAvailable, sort);

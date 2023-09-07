@@ -29,7 +29,7 @@ public class EventMapper {
                 .createdOn(event.getCreatedOn())
                 .initiator(toUserShortDto(event.getInitiator()))
                 .requestModeration(event.getRequestModeration())
-                .publishedOn(event.getPublishedOn() != null ? event.getPublishedOn() : null)
+                .publishedOn(event.getPublishedOn())
                 .build();
     }
 
@@ -59,7 +59,6 @@ public class EventMapper {
         event.setRequestModeration(eventDto.getRequestModeration());
         event.setTitle(eventDto.getTitle());
         event.setInitiator(user);
-
         return event;
     }
 }

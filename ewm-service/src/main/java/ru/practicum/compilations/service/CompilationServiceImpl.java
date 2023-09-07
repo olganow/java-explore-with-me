@@ -25,14 +25,13 @@ import static ru.practicum.compilations.dto.CompilationMapper.mapToCompilationDt
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
 
 
-    @Transactional
     @Override
     public CompilationDto createCompilationAdmin(NewCompilationDto compilationDto) {
         Compilation compilation = mapToNewCompilation(compilationDto);
@@ -45,7 +44,6 @@ public class CompilationServiceImpl implements CompilationService {
         return mapToCompilationDto(compilationRepository.save(compilation));
     }
 
-    @Transactional
     @Override
     public CompilationDto updateCompilationByIdAdmin(Long compId, CompilationUpdatedDto compilationDto) {
         Compilation compilation = getCompilation(compId);
@@ -65,7 +63,6 @@ public class CompilationServiceImpl implements CompilationService {
         return mapToCompilationDto(compilationRepository.save(compilation));
     }
 
-    @Transactional
     @Override
     public void deleteCompilationByIdAdmin(Long compId) {
         getCompilation(compId);
@@ -73,6 +70,7 @@ public class CompilationServiceImpl implements CompilationService {
         compilationRepository.deleteById(compId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<CompilationDto> getAllCompilationsPublic(Boolean pinned, Integer from, Integer size) {
         log.info("Get all compilations");
@@ -88,6 +86,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public CompilationDto getCompilationByIdPublic(Long id) {
         Compilation compilation = getCompilation(id);
@@ -95,6 +94,7 @@ public class CompilationServiceImpl implements CompilationService {
         return mapToCompilationDto(compilation);
     }
 
+    @Transactional(readOnly = true)
     private Compilation getCompilation(Long id) {
         return compilationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Compilation with id=" + id + " hasn't found"));

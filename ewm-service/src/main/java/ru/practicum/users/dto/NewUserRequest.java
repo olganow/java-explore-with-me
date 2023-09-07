@@ -18,6 +18,5 @@ public class NewUserRequest {
 
     @NotBlank(message = "Name can't be blank")
     @Size(min = 2, max = 250)
-   // @Size(max = 250, min = 2)
     private String name;
 }

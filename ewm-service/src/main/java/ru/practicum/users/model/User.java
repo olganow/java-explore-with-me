@@ -22,6 +22,6 @@ public class User {
     @EqualsAndHashCode.Include
     private String email;
 
-    @Column(name = "name",  length = 250)
+    @Column(name = "name", length = 250)
     private String name;
 }

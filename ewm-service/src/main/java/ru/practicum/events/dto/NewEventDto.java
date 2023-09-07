@@ -22,7 +22,7 @@ import static ru.practicum.util.Constants.DATE_DEFAULT;
 public class NewEventDto {
 
     @NotBlank
-    @Size( min = 3, max = 120)
+    @Size(min = 3, max = 120)
     private String title;
 
     @NotBlank

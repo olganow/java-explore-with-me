@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface EventRepository extends JpaRepository<Event, Long>  {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByIdIn(Set<Long> events);
+
     Optional<Event> findByIdAndInitiatorId(Long eventId, Long initiatorId);
 
     @Query("SELECT e " +

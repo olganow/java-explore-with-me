@@ -35,8 +35,8 @@ public class UserAdminController {
 
     @GetMapping()
     public List<UserDto> getUsers(@RequestParam(defaultValue = "") List<Long> ids,
-                                        @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
-                                        @RequestParam(value = "size", defaultValue = PAGE_DEFAULT_SIZE) @Positive Integer size) {
+                                  @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+                                  @RequestParam(value = "size", defaultValue = PAGE_DEFAULT_SIZE) @Positive Integer size) {
         log.info("Get all users with ids: {}", ids);
         return userService.getUsers(ids, from, size);
     }

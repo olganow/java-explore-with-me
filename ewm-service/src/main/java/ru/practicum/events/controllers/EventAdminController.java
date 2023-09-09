@@ -3,7 +3,6 @@ package ru.practicum.events.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.util.enam.EventState;
@@ -30,7 +29,6 @@ public class EventAdminController {
     private final EventService eventService;
 
     @GetMapping
-    @ResponseStatus(value = HttpStatus.OK)
     public Collection<EventFullDto> getEvents(@RequestParam(required = false) List<Long> users,
                                               @RequestParam(required = false) List<EventState> states,
                                               @RequestParam(required = false) List<Long> categories,
@@ -47,7 +45,6 @@ public class EventAdminController {
     }
 
     @PatchMapping("/{eventId}")
-    @ResponseStatus(value = HttpStatus.OK)
     public EventFullDto updateEventAdmin(@PathVariable(value = "eventId") Long eventId,
                                          @Valid @RequestBody EventUpdatedDto eventDto) {
         log.info("Update event {} with id= {}", eventDto, eventId);

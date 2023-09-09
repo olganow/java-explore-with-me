@@ -35,15 +35,14 @@ public class EventPrivateController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public EventFullDto createEvent(@PathVariable(value = "userId") Long userId,
-                                    @Valid @RequestBody NewEventDto eventDto) {
+    public EventFullDto create(@PathVariable(value = "userId") Long userId,
+                               @Valid @RequestBody NewEventDto eventDto) {
         log.info("Create event {} of user with id= {}", eventDto, userId);
         return eventService.createEventPrivate(userId, eventDto);
     }
 
 
     @GetMapping
-    @ResponseStatus(value = HttpStatus.OK)
     public Collection<EventShortDto> getEventsByUserId(@PathVariable(value = "userId") Long userId,
                                                        @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM)
                                                        @PositiveOrZero Integer from,
@@ -54,7 +53,6 @@ public class EventPrivateController {
     }
 
     @GetMapping("/{eventId}")
-    @ResponseStatus(value = HttpStatus.OK)
     public EventFullDto getEventById(@PathVariable(value = "userId") Long userId,
                                      @PathVariable(value = "eventId") Long eventId) {
         log.info("Get event with id= {} of user with id= {}", eventId, userId);
@@ -62,7 +60,6 @@ public class EventPrivateController {
     }
 
     @PatchMapping("/{eventId}")
-    @ResponseStatus(value = HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable(value = "userId") Long userId,
                                     @PathVariable(value = "eventId") Long eventId,
                                     @Valid @RequestBody EventUpdatedDto eventDto) {
@@ -71,7 +68,6 @@ public class EventPrivateController {
     }
 
     @GetMapping("/{eventId}/requests")
-    @ResponseStatus(value = HttpStatus.OK)
     public Collection<ParticipationRequestDto> getParticipationRequest(@PathVariable(value = "userId") Long userId,
                                                                        @PathVariable(value = "eventId") Long eventId) {
         log.info("Get request for event with id= {} for participation for user with id{}", eventId, userId);
@@ -79,7 +75,6 @@ public class EventPrivateController {
     }
 
     @PatchMapping("/{eventId}/requests")
-    @ResponseStatus(value = HttpStatus.OK)
     public EventRequestStatusUpdateResult updateEventRequestStatus(@PathVariable(value = "userId") Long userId,
                                                                    @PathVariable(value = "eventId") Long eventId,
                                                                    @RequestBody EventRequestStatusUpdateRequest updateRequest) {

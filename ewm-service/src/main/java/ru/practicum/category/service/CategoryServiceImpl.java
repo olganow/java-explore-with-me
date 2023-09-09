@@ -9,7 +9,7 @@ import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.CategoryMapper;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.model.Category;
-import ru.practicum.handler.ValidateDateException;
+import ru.practicum.handler.NotAvailableException;
 import ru.practicum.util.Pagination;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.handler.NotFoundException;
@@ -64,13 +64,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategoryById(Long id) {
-        categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Category with id=" + id + " hasn't found"));
-        try {
-            categoryRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new ValidateDateException("The category isn't empty");
+        boolean isExist = categoryRepository.existsById(id);
+        if (!isExist) {
+            throw new NotFoundException("Category with id=" + id + " hasn't found");
+        } else {
+            try {
+                categoryRepository.deleteById(id);
+            } catch (RuntimeException e) {
+                throw new NotAvailableException("The category isn't empty");
+            }
+            log.info("Delete category with id = {}", id);
         }
-        log.info("Delete category with id = {}", id);
     }
 
 }

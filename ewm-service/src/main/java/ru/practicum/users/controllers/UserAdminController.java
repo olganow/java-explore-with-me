@@ -28,15 +28,15 @@ public class UserAdminController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public UserDto saveUser(@Valid @RequestBody NewUserRequest newUserRequest) {
+    public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
         log.info("Create user with id= {}", newUserRequest);
         return userService.createUser(newUserRequest);
     }
 
     @GetMapping()
-    public List<UserDto> getUsers(@RequestParam(defaultValue = "") List<Long> ids,
-                                  @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
-                                  @RequestParam(value = "size", defaultValue = PAGE_DEFAULT_SIZE) @Positive Integer size) {
+    public List<UserDto> get(@RequestParam(defaultValue = "") List<Long> ids,
+                             @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+                             @RequestParam(value = "size", defaultValue = PAGE_DEFAULT_SIZE) @Positive Integer size) {
         log.info("Get all users with ids: {}", ids);
         return userService.getUsers(ids, from, size);
     }

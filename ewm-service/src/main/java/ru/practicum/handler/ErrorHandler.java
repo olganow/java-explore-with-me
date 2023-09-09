@@ -49,6 +49,17 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConstraintViolationException(NotAvailableException e) {
+        log.error("Код ошибки: {}, {}", HttpStatus.CONFLICT, e.getMessage());
+        return Map.of(
+                "status", "CONFLICT",
+                "reason", "Constraint Violation Exception",
+                "message", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleNotValidException(Exception e) {
         log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, e.getMessage());

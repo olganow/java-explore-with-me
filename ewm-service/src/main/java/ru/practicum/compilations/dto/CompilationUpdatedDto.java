@@ -17,7 +17,7 @@ public class CompilationUpdatedDto {
     @Size(min = 1, max = 50)
     private String title;
 
-    private Boolean pinned = false;
+    private Boolean pinned;
 
     private Set<Long> events;
 

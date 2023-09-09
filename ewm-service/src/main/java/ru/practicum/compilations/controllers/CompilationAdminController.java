@@ -21,21 +21,21 @@ public class CompilationAdminController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public CompilationDto createCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
+    public CompilationDto create(@Valid @RequestBody NewCompilationDto newCompilationDto) {
         log.info("Create compilation {}", newCompilationDto);
         return compilationService.createCompilationAdmin(newCompilationDto);
     }
 
     @PatchMapping("/{compId}")
-    public CompilationDto updateCompilationById(@PathVariable(value = "compId") Long compId,
-                                                @Valid @RequestBody CompilationUpdatedDto compilationDto) {
+    public CompilationDto updateById(@PathVariable(value = "compId") Long compId,
+                                     @Valid @RequestBody CompilationUpdatedDto compilationDto) {
         log.info("Update compilation {} with id = {}", compilationDto, compId);
         return compilationService.updateCompilationByIdAdmin(compId, compilationDto);
     }
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable(value = "compId") Long compId) {
+    public void delete(@PathVariable(value = "compId") Long compId) {
         log.info("Delete compilation  with id = {}", compId);
         compilationService.deleteCompilationByIdAdmin(compId);
     }

@@ -36,10 +36,17 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createCompilationAdmin(NewCompilationDto compilationDto) {
         Compilation compilation = mapToNewCompilation(compilationDto);
 
+        if (compilationDto.getPinned() != null) {
+            compilation.setPinned(compilationDto.getPinned());
+        } else {
+            compilation.setPinned(false);
+        }
+
         if (compilationDto.getEvents() != null) {
             List<Event> events = eventRepository.findAllByIdIn(compilationDto.getEvents());
             compilation.setEvents(events);
         }
+
         log.info("Create compilation {} ", compilationDto);
         return mapToCompilationDto(compilationRepository.save(compilation));
     }
@@ -56,7 +63,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (pinned != null) {
             compilation.setPinned(pinned);
         }
-        if (title != null) {
+        if (title != null && !title.isBlank()) {
             compilation.setTitle(title);
         }
         log.info("Update compilation with id= {} ", compId);

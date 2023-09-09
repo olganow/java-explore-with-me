@@ -7,6 +7,7 @@ import ru.practicum.util.enam.EventStateAction;
 import ru.practicum.events.model.Location;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -39,6 +40,7 @@ public class EventUpdatedDto {
 
     private Boolean paid;
 
+    @PositiveOrZero
     private Integer participantLimit;
 
     private Boolean requestModeration;

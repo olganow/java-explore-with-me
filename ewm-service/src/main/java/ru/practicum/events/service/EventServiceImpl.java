@@ -2,10 +2,13 @@ package ru.practicum.events.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.util.enam.EventsSort;
@@ -39,12 +42,16 @@ import static ru.practicum.events.dto.EventMapper.mapToNewEvent;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+@PropertySource(value = {"classpath:application.properties"})
 public class EventServiceImpl implements EventService {
+    @Value("${app}")
+    String app;
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -159,7 +166,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
 
         saveViewInEvent(result);
-        statsClient.saveStats(APP, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+        statsClient.saveStats(app, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         if (sort.equals(VIEWS)) {
             return result.stream()
@@ -184,7 +191,7 @@ public class EventServiceImpl implements EventService {
         if (views != null) {
             fullDto.setViews(views.size());
         }
-        statsClient.saveStats(APP, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+        statsClient.saveStats(app, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         log.info("Get event with  id = {}}", id);
         return fullDto;
@@ -247,10 +254,10 @@ public class EventServiceImpl implements EventService {
     }
 
     private void updateEventCommonFields(Event event, EventUpdatedDto eventDto) {
-        if (eventDto.getAnnotation() != null) {
+        if (eventDto.getAnnotation() != null && !eventDto.getAnnotation().isBlank()) {
             event.setAnnotation(eventDto.getAnnotation());
         }
-        if (eventDto.getDescription() != null) {
+        if (eventDto.getDescription() != null && !eventDto.getDescription().isBlank()) {
             event.setDescription(eventDto.getDescription());
         }
         if (eventDto.getCategory() != null) {
@@ -266,7 +273,7 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getRequestModeration() != null) {
             event.setRequestModeration(eventDto.getRequestModeration());
         }
-        if (eventDto.getTitle() != null) {
+        if (eventDto.getTitle() != null && !eventDto.getTitle().isBlank()) {
             event.setTitle(eventDto.getTitle());
         }
         if (eventDto.getLocation() != null) {

@@ -16,5 +16,4 @@ public class Constants {
             .format(DateTimeFormatter.ofPattern(DATE_DEFAULT));
     public static final String END_DATE = LocalDateTime.now().plusDays(1000)
             .format(DateTimeFormatter.ofPattern(DATE_DEFAULT));
-    public static final String APP = "ewm-main-service";
 }

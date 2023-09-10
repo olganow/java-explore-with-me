@@ -1,14 +1,22 @@
 package ru.practicum.requests.dto;
 
-import lombok.Data;
-import ru.practicum.util.enam.EventRequestStatus;
+import lombok.*;
+import ru.practicum.events.dto.EventUpdatedDto;
 
 import java.util.Set;
 
-@Data
-public class EventRequestStatusUpdateRequest {
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+public class EventRequestStatusUpdateRequest extends EventUpdatedDto {
 
     private Set<Long> requestIds;
 
     private EventRequestStatus status;
+
+    public enum EventRequestStatus {
+        CONFIRMED,
+        REJECTED
+    }
 }

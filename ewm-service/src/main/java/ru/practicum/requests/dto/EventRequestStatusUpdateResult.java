@@ -1,6 +1,7 @@
 package ru.practicum.requests.dto;
 
 import lombok.*;
+import ru.practicum.events.dto.EventUpdatedDto;
 
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
 @Setter
 @ToString
 @AllArgsConstructor
-public class EventRequestStatusUpdateResult {
+public class EventRequestStatusUpdateResult extends EventUpdatedDto {
 
     private List<ParticipationRequestDto> confirmedRequests;
 

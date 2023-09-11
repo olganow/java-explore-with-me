@@ -37,7 +37,7 @@ public class EventFullDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_DEFAULT)
     private LocalDateTime createdOn;
 
-    private LocationDto locationDto;
+    private LocationDto location;
 
     private boolean paid;
 

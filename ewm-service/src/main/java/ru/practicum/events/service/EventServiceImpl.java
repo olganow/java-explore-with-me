@@ -30,6 +30,7 @@ import ru.practicum.users.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -318,7 +319,9 @@ public class EventServiceImpl implements EventService {
         Optional<LocalDateTime> start = eventRepository.getStart(eventIds);
 
         if (start.isPresent()) {
-            List<ViewStatsDto> views = statsClient.getStats(start.get().toString(), LocalDateTime.now().toString(), uris, true).getBody();
+            List<ViewStatsDto> views = statsClient.getStats(
+                    start.get().format(DateTimeFormatter.ofPattern(DATE_DEFAULT)), LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_DEFAULT)),
+                    uris, true).getBody();
 
             if (views != null) {
                 Map<Long, Long> mapIdHits = views.stream()

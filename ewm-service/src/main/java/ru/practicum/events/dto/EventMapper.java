@@ -20,7 +20,7 @@ public class EventMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
                 .id(event.getId())
-                .locationDto(mapToLocationDto(event.getLocation()))
+                .location(mapToLocationDto(event.getLocation()))
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
                 .title(event.getTitle())

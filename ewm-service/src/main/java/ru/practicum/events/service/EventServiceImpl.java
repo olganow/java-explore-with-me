@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.events.model.Location;
+import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.util.enam.EventsSort;
 import ru.practicum.util.Pagination;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.practicum.events.dto.LocationMapper.mapToLocation;
 import static ru.practicum.util.enam.EventsSort.EVENT_DATE;
 import static ru.practicum.util.enam.EventsSort.VIEWS;
 import static ru.practicum.util.Constants.*;
@@ -51,6 +54,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
+    private final LocationRepository locationRepository;
 
 
     @Transactional(readOnly = true)
@@ -80,7 +84,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEventById(eventId);
         updateEventAdmin(event, eventUpdatedDto);
         event = eventRepository.save(event);
-
+        locationRepository.save(event.getLocation());
         log.info("Update event with id= {} in admin ", eventId);
         return mapToEventFullDto(event);
     }
@@ -92,7 +96,9 @@ public class EventServiceImpl implements EventService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " hasn't found"));
         Category category = getCategoryForEvent(newEventDto.getCategory());
-        Event event = eventRepository.save(mapToNewEvent(newEventDto, user, category));
+        Location savedLocation = locationRepository
+                .save(mapToLocation(newEventDto.getLocation()));
+        Event event = eventRepository.save(mapToNewEvent(newEventDto, savedLocation, user, category));
         log.info("User id= {} create event in admin", userId);
         return mapToEventFullDto(event);
     }
@@ -122,8 +128,10 @@ public class EventServiceImpl implements EventService {
             throw new ValidateException("Events with CANCELED or PENDING can be updated");
         }
         updateEvent(event, eventUpdatedDto);
+        Event eventSaved = eventRepository.save(event);
+        locationRepository.save(eventSaved.getLocation());
         log.info("Update event with id={} of user with id= {} in private", eventId, userId);
-        return mapToEventFullDto(eventRepository.save(event));
+        return mapToEventFullDto(eventSaved);
     }
 
     @Transactional(readOnly = true)
@@ -277,8 +285,7 @@ public class EventServiceImpl implements EventService {
             event.setTitle(eventDto.getTitle());
         }
         if (eventDto.getLocation() != null) {
-            event.setLat(eventDto.getLocation().getLat());
-            event.setLon(eventDto.getLocation().getLon());
+            event.setLocation(mapToLocation(eventDto.getLocation()));
         }
         if (eventDto.getEventDate() != null) {
             validateEventDate(eventDto.getEventDate());
@@ -304,17 +311,25 @@ public class EventServiceImpl implements EventService {
                 .map(eventShortDto -> "/events/" + eventShortDto.getId())
                 .collect(Collectors.toList());
 
-        List<ViewStatsDto> views = statsClient.getStats(START_DATE, END_DATE, uris, null).getBody();
+        List<Long> eventIds = result.stream()
+                .map(EventShortDto::getId)
+                .collect(Collectors.toList());
 
-        if (views != null) {
-            Map<Long, Long> mapIdHits = views.stream()
-                    .collect(Collectors.toMap(viewStats -> getId(viewStats.getUri()), ViewStatsDto::getHits));
+        Optional<LocalDateTime> start = eventRepository.getStart(eventIds);
 
-            result.forEach(eventShortDto -> {
-                Long eventId = eventShortDto.getId();
-                Long viewsCount = mapIdHits.getOrDefault(eventId, 0L);
-                eventShortDto.setViews(viewsCount);
-            });
+        if (start.isPresent()) {
+            List<ViewStatsDto> views = statsClient.getStats(start.get().toString(), LocalDateTime.now().toString(), uris, true).getBody();
+
+            if (views != null) {
+                Map<Long, Long> mapIdHits = views.stream()
+                        .collect(Collectors.toMap(viewStats -> getId(viewStats.getUri()), ViewStatsDto::getHits));
+
+                result.forEach(eventShortDto -> {
+                    Long eventId = eventShortDto.getId();
+                    Long viewsCount = mapIdHits.getOrDefault(eventId, 0L);
+                    eventShortDto.setViews(viewsCount);
+                });
+            }
         }
     }
 

@@ -16,7 +16,10 @@ import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.events.repository.EventRepository;
 import ru.practicum.handler.NotFoundException;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.practicum.compilations.dto.CompilationMapper.mapToNewCompilation;
@@ -27,6 +30,7 @@ import static ru.practicum.compilations.dto.CompilationMapper.mapToCompilationDt
 @RequiredArgsConstructor
 @Transactional
 public class CompilationServiceImpl implements CompilationService {
+
 
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
@@ -42,32 +46,37 @@ public class CompilationServiceImpl implements CompilationService {
             compilation.setPinned(false);
         }
 
-        if (compilationDto.getEvents() != null) {
-            List<Event> events = eventRepository.findAllByIdIn(compilationDto.getEvents());
+        Set<Long> eventsId = compilationDto.getEvents();
+        if (eventsId != null) {
+            Set<Event> events = new HashSet<>(eventRepository.findAllByIdIn(eventsId));
             compilation.setEvents(events);
         }
 
-        log.info("Create compilation {} ", compilationDto);
-        return mapToCompilationDto(compilationRepository.save(compilation));
+        Compilation savedCompilation = compilationRepository.save(compilation);
+
+        return mapToCompilationDto(savedCompilation);
     }
 
-    @Override
-    public CompilationDto updateCompilationByIdAdmin(Long compId, CompilationUpdatedDto compilationDto) {
-        Compilation compilation = getCompilation(compId);
-        Boolean pinned = compilationDto.getPinned();
-        String title = compilationDto.getTitle();
 
-        if (compilationDto.getEvents() != null) {
-            compilation.setEvents(eventRepository.findAllById(compilationDto.getEvents()));
+    @Override
+    public CompilationDto updateCompilationByIdAdmin(Long compId, CompilationUpdatedDto dto) {
+        Compilation toUpdate = compilationRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException(String.format("Compilation %s not found", compId)));
+
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
+            toUpdate.setTitle(dto.getTitle());
         }
-        if (pinned != null) {
-            compilation.setPinned(pinned);
+        if (dto.getPinned() != null) {
+            toUpdate.setPinned(dto.getPinned());
         }
-        if (title != null && !title.isBlank()) {
-            compilation.setTitle(title);
+
+        if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
+            Set<Long> eventsId = dto.getEvents();
+            Collection<Event> events = eventRepository.findAllByIdIn(eventsId);
+            toUpdate.setEvents(new HashSet<>(events));
         }
-        log.info("Update compilation with id= {} ", compId);
-        return mapToCompilationDto(compilationRepository.save(compilation));
+
+        return mapToCompilationDto(toUpdate);
     }
 
     @Override

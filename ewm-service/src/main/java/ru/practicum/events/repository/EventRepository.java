@@ -3,11 +3,13 @@ package ru.practicum.events.repository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.events.model.Event;
 import ru.practicum.util.Pagination;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -70,6 +72,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     )
     List<Event> findAllPublishStateNotAvailable(EventState state, LocalDateTime rangeStart, List<Long> categories,
                                                 Boolean paid, String text, Pagination pageable);
+
+    @Query("SELECT MIN(e.publishedOn) FROM Event e WHERE e.id IN :eventsId")
+    Optional<LocalDateTime> getStart(@Param("eventsId") Collection<Long> eventsId);
 
 
 }

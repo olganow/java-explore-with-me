@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import ru.practicum.events.model.Location;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
@@ -38,7 +38,9 @@ public class NewEventDto {
     @JsonFormat(pattern = DATE_DEFAULT)
     private LocalDateTime eventDate;
 
-    private Location location;
+    @Valid
+    @NotNull
+    private LocationDto location;
 
     @NotNull
     private Boolean paid = false;

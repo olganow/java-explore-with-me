@@ -15,7 +15,7 @@ public class CompilationMapper {
                         ? compilation.getEvents()
                         .stream()
                         .map(EventMapper::mapToEventShortDto)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toSet())
                         : null)
                 .id(compilation.getId())
                 .pinned(compilation.getPinned())

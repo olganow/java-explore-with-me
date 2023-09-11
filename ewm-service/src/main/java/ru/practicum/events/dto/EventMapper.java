@@ -8,6 +8,7 @@ import ru.practicum.events.model.Location;
 import ru.practicum.users.model.User;
 
 import static ru.practicum.category.dto.CategoryMapper.toCategoryDto;
+import static ru.practicum.events.dto.LocationMapper.mapToLocationDto;
 import static ru.practicum.users.dto.UserMapper.toUserShortDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,7 +20,7 @@ public class EventMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
                 .id(event.getId())
-                .location(new Location(event.getLat(), event.getLon()))
+                .locationDto(mapToLocationDto(event.getLocation()))
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
                 .title(event.getTitle())
@@ -46,14 +47,13 @@ public class EventMapper {
                 .build();
     }
 
-    public static Event mapToNewEvent(NewEventDto eventDto, User user, Category category) {
+    public static Event mapToNewEvent(NewEventDto eventDto, Location location, User user, Category category) {
         Event event = new Event();
         event.setAnnotation(eventDto.getAnnotation());
         event.setCategory(category);
         event.setDescription(eventDto.getDescription());
         event.setEventDate(eventDto.getEventDate());
-        event.setLat(eventDto.getLocation().getLat());
-        event.setLon(eventDto.getLocation().getLon());
+        event.setLocation(location);
         event.setPaid(eventDto.getPaid());
         event.setParticipantLimit(eventDto.getParticipantLimit());
         event.setRequestModeration(eventDto.getRequestModeration());

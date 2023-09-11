@@ -47,11 +47,10 @@ public class Event {
     @DateTimeFormat(pattern = DATE_DEFAULT)
     private LocalDateTime eventDate;
 
-    @Column(name = "location_lat", nullable = false)
-    private float lat;
-
-    @Column(name = "location_lon", nullable = false)
-    private float lon;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    @ToString.Exclude
+    private Location location;
 
     @Column(nullable = false)
     private Boolean paid;

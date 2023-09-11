@@ -1,23 +1,27 @@
 package ru.practicum.events.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
+@Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "locations")
 public class Location {
 
-    @NotNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "lat")
     private Float lat;
 
-    @NotNull
+    @Column(name = "lon")
     private Float lon;
-
 }
+

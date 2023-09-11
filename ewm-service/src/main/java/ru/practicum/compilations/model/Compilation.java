@@ -1,22 +1,20 @@
 package ru.practicum.compilations.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.DynamicUpdate;
+import lombok.*;
 import ru.practicum.events.model.Event;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "compilations")
 @Getter
 @Setter
-@EqualsAndHashCode
-@DynamicUpdate
+@Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Compilation {
 
     @Id
@@ -29,9 +27,22 @@ public class Compilation {
 
     @Column(nullable = false)
     private Boolean pinned;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "compilation_events", joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> events;
+    @ToString.Exclude
+    private Set<Event> events;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Compilation that = (Compilation) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(getId());
+    }
 }

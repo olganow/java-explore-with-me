@@ -4,8 +4,6 @@ package ru.practicum.events.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.util.enam.EventStateAction;
-import ru.practicum.events.model.Location;
-
 import javax.validation.constraints.Future;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
@@ -36,7 +34,7 @@ public class EventUpdatedDto {
     @JsonFormat(pattern = DATE_DEFAULT)
     private LocalDateTime eventDate;
 
-    private Location location;
+    private LocationDto location;
 
     private Boolean paid;
 

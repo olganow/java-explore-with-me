@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.events.dto.EventShortDto;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,5 +18,5 @@ public class CompilationDto {
 
     private boolean pinned;
 
-    private List<EventShortDto> events;
+    private Set<EventShortDto> events;
 }

@@ -56,7 +56,7 @@ public class Event {
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
 
-    @Column(name = "confirmed_requests")
+    @Transient
     private Integer confirmedRequests = 0;
 
     @Column(name = "request_moderation", nullable = false)

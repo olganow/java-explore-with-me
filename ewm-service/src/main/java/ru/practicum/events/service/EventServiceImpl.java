@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.events.model.Location;
 import ru.practicum.events.repository.LocationRepository;
+import ru.practicum.requests.repository.RequestRepository;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.util.enam.EventsSort;
 import ru.practicum.util.Pagination;
@@ -56,6 +57,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
+    private final RequestRepository requestRepository;
 
 
     @Transactional(readOnly = true)
@@ -158,6 +160,7 @@ public class EventServiceImpl implements EventService {
             pageable = new Pagination(from, size, Sort.unsorted());
         }
 
+       // int confirmedRequests =  requestRepository.countByEventIdAndStatus(eventId, CONFIRMED);
         if (onlyAvailable) {
             events = eventRepository.findAllPublishStateNotAvailable(state, getRangeStart(rangeStart), categories,
                     paid, text, pageable);

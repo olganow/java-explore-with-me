@@ -105,7 +105,8 @@ public class RequestServiceImpl implements RequestService {
         ParticipationRequest participationRequest = requestRepository.save(mapToNewParticipationRequest(event, user));
 
         if (participationRequest.getStatus() == CONFIRMED) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        int confirmedRequests =  requestRepository.countByEventIdAndStatus(eventId, CONFIRMED);
+          event.setConfirmedRequests(confirmedRequests);
             eventRepository.save(event);
         }
 

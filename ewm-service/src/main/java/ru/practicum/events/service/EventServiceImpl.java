@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.events.model.Location;
-import ru.practicum.events.repository.LocationRepository;
+import ru.practicum.locations.model.Location;
+import ru.practicum.locations.repository.LocationRepository;
 import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.requests.repository.RequestRepository;
 import ru.practicum.util.enam.EventRequestStatus;
@@ -37,7 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.practicum.events.dto.LocationMapper.mapToLocation;
+import static ru.practicum.locations.dto.LocationMapper.mapToLocation;
 import static ru.practicum.util.enam.EventsSort.EVENT_DATE;
 import static ru.practicum.util.enam.EventsSort.VIEWS;
 import static ru.practicum.util.Constants.*;

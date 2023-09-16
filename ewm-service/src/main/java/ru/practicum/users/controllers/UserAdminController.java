@@ -27,13 +27,13 @@ public class UserAdminController {
     private final UserService userService;
 
     @PostMapping
-    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
         log.info("Create user with id= {}", newUserRequest);
         return userService.createUser(newUserRequest);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<UserDto> get(@RequestParam(defaultValue = "") List<Long> ids,
                              @RequestParam(value = "from", defaultValue = PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
                              @RequestParam(value = "size", defaultValue = PAGE_DEFAULT_SIZE) @Positive Integer size) {
@@ -42,7 +42,7 @@ public class UserAdminController {
     }
 
     @DeleteMapping("/{userId}")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable(value = "userId") Long userId) {
         log.info("Delete user with id= {}", userId);
         userService.deleteUserById(userId);

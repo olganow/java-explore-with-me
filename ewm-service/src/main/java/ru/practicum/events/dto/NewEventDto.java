@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.practicum.locations.dto.LocationDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;

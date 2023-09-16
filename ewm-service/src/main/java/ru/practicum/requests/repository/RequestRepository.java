@@ -1,6 +1,7 @@
 package ru.practicum.requests.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import ru.practicum.events.model.Event;
 import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.util.enam.EventRequestStatus;
 
@@ -20,6 +21,8 @@ public interface RequestRepository extends JpaRepository<ParticipationRequest, L
 
     List<ParticipationRequest> findAllByEventId(Long eventId);
 
-    int countByEventIdAndStatus(Long eventId, EventRequestStatus status);
+    Long countRequestByEventIdAndStatus(Long eventId, EventRequestStatus state);
+
+    List<ParticipationRequest> findAllByEventInAndStatus(List<Event> event, EventRequestStatus status);
 
 }

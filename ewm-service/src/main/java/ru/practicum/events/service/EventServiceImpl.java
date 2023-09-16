@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.events.model.Location;
 import ru.practicum.events.repository.LocationRepository;
+import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.util.enam.EventRequestStatus;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.util.enam.EventsSort;
 import ru.practicum.util.Pagination;
@@ -55,12 +57,10 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final RequestRepository requestRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
-    private final RequestRepository requestRepository;
 
-
-    @Transactional(readOnly = true)
     @Override
     public List<EventFullDto> getAllEventsAdmin(List<Long> users,
                                                 List<EventState> states,
@@ -74,13 +74,13 @@ public class EventServiceImpl implements EventService {
         PageRequest pageable = new Pagination(from, size, Sort.unsorted());
         List<Event> events = eventRepository.findAllForAdmin(users, states, categories, getRangeStart(rangeStart),
                 pageable);
+        confirmedRequestForListEvent(events);
 
         log.info("Get all events in admin {}", events);
         return events.stream()
                 .map(EventMapper::mapToEventFullDto)
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public EventFullDto updateEventByIdAdmin(Long eventId, EventUpdatedDto eventUpdatedDto) {
@@ -102,6 +102,7 @@ public class EventServiceImpl implements EventService {
         Location savedLocation = locationRepository
                 .save(mapToLocation(newEventDto.getLocation()));
         Event event = eventRepository.save(mapToNewEvent(newEventDto, savedLocation, user, category));
+        confirmedRequestsForOneEvent(event);
         log.info("User id= {} create event in admin", userId);
         return mapToEventFullDto(event);
     }
@@ -110,8 +111,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getAllEventsByUserIdPrivate(Long userId, int from, int size) {
         log.info("Get all events of user with id= {} in private", userId);
-        return eventRepository.findAllWithInitiatorByInitiatorId(userId, new Pagination(from, size,
-                        Sort.unsorted())).stream()
+        List<Event> events = eventRepository.findAllWithInitiatorByInitiatorId(userId, new Pagination(from, size,
+                Sort.unsorted()));
+        confirmedRequestForListEvent(events);
+
+        return events.stream()
                 .map(EventMapper::mapToEventShortDto)
                 .collect(Collectors.toList());
     }
@@ -120,6 +124,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByIdPrivate(Long userId, Long eventId) {
         Event event = getEventByIdAndInitiatorId(eventId, userId);
+        confirmedRequestsForOneEvent(event);
         log.info("Get event with id={} of user with id= {} in private", eventId, userId);
         return mapToEventFullDto(event);
     }
@@ -160,7 +165,6 @@ public class EventServiceImpl implements EventService {
             pageable = new Pagination(from, size, Sort.unsorted());
         }
 
-       // int confirmedRequests =  requestRepository.countByEventIdAndStatus(eventId, CONFIRMED);
         if (onlyAvailable) {
             events = eventRepository.findAllPublishStateNotAvailable(state, getRangeStart(rangeStart), categories,
                     paid, text, pageable);
@@ -173,6 +177,7 @@ public class EventServiceImpl implements EventService {
             events = getEventsBeforeRangeEnd(events, rangeEnd);
         }
 
+        confirmedRequestForListEvent(events);
         List<EventShortDto> result = events.stream()
                 .map(EventMapper::mapToEventShortDto)
                 .collect(Collectors.toList());
@@ -192,6 +197,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByIdPublic(Long id, HttpServletRequest request) {
         Event event = getEventById(id);
+        confirmedRequestsForOneEvent(event);
         if (!event.getState().equals(PUBLISHED)) {
             throw new NotFoundException("Event with id=" + id + " hasn't not published");
         }
@@ -357,5 +363,20 @@ public class EventServiceImpl implements EventService {
         return events.stream().filter(event -> event.getEventDate().isBefore(rangeEnd)).collect(Collectors.toList());
     }
 
+    public void confirmedRequestsForOneEvent(Event event) {
+        event.setConfirmedRequests(requestRepository
+                .countRequestByEventIdAndStatus(event.getId(), EventRequestStatus.CONFIRMED));
+    }
+
+    public void confirmedRequestForListEvent(List<Event> events) {
+        Map<Event, Long> requestsPerEvent = requestRepository.findAllByEventInAndStatus(events, EventRequestStatus.CONFIRMED)
+                .stream()
+                .collect(Collectors.groupingBy(ParticipationRequest::getEvent, Collectors.counting()));
+        if (!requestsPerEvent.isEmpty()) {
+            for (Event event : events) {
+                event.setConfirmedRequests(requestsPerEvent.getOrDefault(event, 0L));
+            }
+        }
+    }
 
 }

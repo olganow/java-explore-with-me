@@ -15,6 +15,9 @@ public class LocationMapper {
     }
 
     public static LocationDto mapToLocationDto(Location location) {
+        if (location == null) {
+            return null;
+        }
         LocationDto locationDto = new LocationDto();
         locationDto.setLat(location.getLat());
         locationDto.setLon(location.getLon());

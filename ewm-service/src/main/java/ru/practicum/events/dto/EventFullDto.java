@@ -43,7 +43,7 @@ public class EventFullDto {
 
     private int participantLimit;
 
-    private int confirmedRequests;
+    private long confirmedRequests;
 
     private long views;
 

@@ -15,6 +15,10 @@ import static ru.practicum.users.dto.UserMapper.toUserShortDto;
 public class EventMapper {
 
     public static EventFullDto mapToEventFullDto(Event event) {
+        if (event == null) {
+            return null;
+        }
+
         return EventFullDto.builder()
                 .annotation(event.getAnnotation())
                 .confirmedRequests(event.getConfirmedRequests())

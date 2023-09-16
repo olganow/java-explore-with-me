@@ -46,8 +46,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                     "JOIN FETCH e.initiator i " +
                     "JOIN FETCH e.category c " +
                     "WHERE e.state = :state " +
-                    "AND (e.participantLimit = 0 OR e.participantLimit > (" +
-                    "SELECT COUNT(*) FROM ParticipationRequest pr WHERE pr.event.id = e.id AND pr.status = 'CONFIRMED')) " +
                     "AND (e.category.id IN :categories OR :categories IS NULL) " +
                     "AND e.eventDate > :rangeStart " +
                     "AND (e.paid = :paid OR :paid IS NULL) " +
@@ -64,13 +62,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "JOIN FETCH e.initiator " +
             "JOIN FETCH e.category " +
             "WHERE e.state = :state " +
-            "AND (e.participantLimit = 0 OR e.participantLimit > (" +
-            "SELECT COUNT(*) FROM ParticipationRequest pr WHERE pr.event.id = e.id AND pr.status = 'CONFIRMED')) " +
             "AND (e.category.id IN :categories OR :categories IS NULL) " +
             "AND e.eventDate > :rangeStart " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:text IS NULL OR UPPER(e.annotation) LIKE UPPER(:searchPattern)) " +
-            "OR (:text IS NULL OR UPPER(e.description) LIKE UPPER(:searchPattern))")
+            "OR (:text IS NULL OR UPPER(e.description) LIKE UPPER(:searchPattern))"
+    )
     List<Event> findAllPublishStateNotAvailable(EventState state, LocalDateTime rangeStart, List<Long> categories,
                                                 Boolean paid, String text, Pagination pageable);
 

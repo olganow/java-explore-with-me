@@ -57,7 +57,7 @@ public class Event {
     private Integer participantLimit;
 
     @Transient
-    private Integer confirmedRequests = 0;
+    private Long confirmedRequests = 0L;
 
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;

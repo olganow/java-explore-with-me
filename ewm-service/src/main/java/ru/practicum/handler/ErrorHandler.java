@@ -1,6 +1,7 @@
 package ru.practicum.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -41,7 +42,8 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({ConstraintViolationException.class, ValidateException.class, NotAvailableException.class,
+            DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleConstraintViolationException(RuntimeException e) {
         log.error("Код ошибки: {}, {}", HttpStatus.CONFLICT, e.getMessage());
@@ -52,48 +54,15 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleConstraintViolationException(NotAvailableException e) {
-        log.error("Код ошибки: {}, {}", HttpStatus.CONFLICT, e.getMessage());
-        return Map.of(
-                "status", "CONFLICT",
-                "reason", "Constraint Violation Exception",
-                "message", e.getMessage()
-        );
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNotValidException(MethodArgumentNotValidException e) {
-        log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, e.getMessage());
-        return Map.of(
-                "status", "BAD REQUEST",
-                "reason", "Request isn't correct",
-                "message", e.getMessage()
-        );
-    }
-
-
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class, ConstraintViolationException.class,
-            MissingServletRequestParameterException.class})
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class, ValidateDateException.class,
+            MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleNotValidException(final RuntimeException e) {
         log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, e.getMessage());
         return Map.of(
                 "status", "BAD REQUEST",
                 "reason", "Request isn't correct",
-                "message", e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleViolationDateException(ValidateDateException e) {
-        log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, e.getMessage());
-        return Map.of(
-                "status", "BAD REQUEST",
-                "reason", "Request conditions aren't correct",
                 "message", e.getMessage()
         );
     }

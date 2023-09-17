@@ -16,18 +16,19 @@ public class StatHit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private int id;
 
-    @Column(name = "app")
+    @Column(name = "app", nullable = false)
     private String app;
 
-    @Column(name = "uri")
+    @Column(name = "uri", nullable = false)
     private String uri;
 
-    @Column(name = "ip")
+    @Column(name = "ip", nullable = false)
     private String ip;
 
-    @Column(name = "created")
+
+    @Column(name = "created", nullable = false)
     private LocalDateTime timestamp;
 }

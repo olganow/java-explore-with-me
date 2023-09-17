@@ -33,7 +33,6 @@ import ru.practicum.users.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +51,7 @@ import static ru.practicum.events.dto.EventMapper.mapToNewEvent;
 @PropertySource(value = {"classpath:application.properties"})
 public class EventServiceImpl implements EventService {
     @Value("${app}")
-    String app;
+    private String app;
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -142,7 +141,6 @@ public class EventServiceImpl implements EventService {
         return mapToEventFullDto(eventSaved);
     }
 
-    @Transactional(readOnly = true)
     public List<EventShortDto> getEventsPublic(String text,
                                                List<Long> categories,
                                                Boolean paid,
@@ -182,7 +180,7 @@ public class EventServiceImpl implements EventService {
                 .map(EventMapper::mapToEventShortDto)
                 .collect(Collectors.toList());
 
-        saveViewInEvent(result);
+        saveViewInEvent(result, rangeStart);
         statsClient.saveStats(app, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         if (sort.equals(VIEWS)) {
@@ -190,7 +188,8 @@ public class EventServiceImpl implements EventService {
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         }
-        log.info("Get all  event with text {}, category {}", text, categories);
+
+        log.info("Get all event with text {}, category {}", text, categories);
         return result;
     }
 
@@ -316,20 +315,14 @@ public class EventServiceImpl implements EventService {
         return Long.valueOf(uri[uri.length - 1]);
     }
 
-    private void saveViewInEvent(List<EventShortDto> result) {
+    private void saveViewInEvent(List<EventShortDto> result, LocalDateTime rangeStart) {
         List<String> uris = result.stream()
                 .map(eventShortDto -> "/events/" + eventShortDto.getId())
                 .collect(Collectors.toList());
 
-        List<Long> eventIds = result.stream()
-                .map(EventShortDto::getId)
-                .collect(Collectors.toList());
-
-        Optional<LocalDateTime> start = eventRepository.getStart(eventIds);
-
-        if (start.isPresent()) {
+        if (rangeStart != null) {
             List<ViewStatsDto> views = statsClient.getStats(
-                    start.get().format(DateTimeFormatter.ofPattern(DATE_DEFAULT)), LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_DEFAULT)),
+                    rangeStart.format(START_DATE_FORMATTER), LocalDateTime.now().format(START_DATE_FORMATTER),
                     uris, true).getBody();
 
             if (views != null) {

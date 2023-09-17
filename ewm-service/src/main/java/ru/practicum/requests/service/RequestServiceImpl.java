@@ -64,7 +64,6 @@ public class RequestServiceImpl implements RequestService {
         }
 
         event.setConfirmedRequests(event.getConfirmedRequests() + confirmedRequests.size());
-        eventRepository.save(event);
 
         List<ParticipationRequest> updatedRequests = Stream.concat(confirmedRequests.stream(), rejectedRequests.stream())
                 .collect(Collectors.toList());
@@ -105,11 +104,6 @@ public class RequestServiceImpl implements RequestService {
         }
 
         ParticipationRequest participationRequest = requestRepository.save(mapToNewParticipationRequest(event, user));
-
-        if (participationRequest.getStatus() == CONFIRMED) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventRepository.save(event);
-        }
 
         log.info("Create participation request {} ", participationRequest);
         return mapToParticipationRequestDto(participationRequest);

@@ -239,7 +239,8 @@ public class EventServiceImpl implements EventService {
         });
 
         return eventsMap.values().stream()
-                .map(event -> {long commentCount = commentCounts.getOrDefault(event.getId(), 0);
+                .map(event -> {
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0);
                     return mapToEventFullDtoWithComments(event, commentCount);
                 })
                 .collect(Collectors.toList());

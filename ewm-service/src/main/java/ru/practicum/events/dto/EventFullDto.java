@@ -3,13 +3,11 @@ package ru.practicum.events.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.category.dto.CategoryDto;
-import ru.practicum.comments.dto.CommentDto;
 import ru.practicum.locations.dto.LocationDto;
 import ru.practicum.util.enam.EventState;
 import ru.practicum.users.dto.UserShortDto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static ru.practicum.util.Constants.DATE_DEFAULT;
 
@@ -56,6 +54,6 @@ public class EventFullDto {
 
     private UserShortDto initiator;
 
-    private List<CommentDto> comments;
+    private long comments;
 
 }

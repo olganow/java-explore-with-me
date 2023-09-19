@@ -38,9 +38,9 @@ public class CommentPrivateController {
     @PatchMapping("/comments/{commentId}")
     public CommentDto updateComment(@PathVariable(value = "userId") Long userId,
                                     @PathVariable(value = "commentId") Long commentId,
-                                    @Valid @RequestBody CommentDto commentDto) {
+                                    @Valid @RequestBody NewCommentDto newCommentDto) {
         log.info("Update comment with id={} and userId={}", commentId, userId);
-        return commentService.updateCommentByIdPrivate(userId, commentId, commentDto);
+        return commentService.updateCommentByIdPrivate(userId, commentId, newCommentDto);
     }
 
     @GetMapping("/comments/{commentId}")

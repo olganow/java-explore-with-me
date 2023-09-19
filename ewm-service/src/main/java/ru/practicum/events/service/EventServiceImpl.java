@@ -9,8 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ru.practicum.comments.dto.CommentDto;
-import ru.practicum.comments.dto.CommentMapper;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.locations.model.Location;
@@ -40,13 +39,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ru.practicum.events.dto.EventMapper.*;
+import static ru.practicum.events.dto.EventMapper.mapToEventFullDtoWithComments;
 import static ru.practicum.locations.dto.LocationMapper.mapToLocation;
 import static ru.practicum.util.enam.EventsSort.EVENT_DATE;
 import static ru.practicum.util.enam.EventsSort.VIEWS;
 import static ru.practicum.util.Constants.*;
 import static ru.practicum.util.enam.EventState.*;
-import static ru.practicum.events.dto.EventMapper.mapToEventFullDto;
-import static ru.practicum.events.dto.EventMapper.mapToNewEvent;
 
 @Service
 @Slf4j
@@ -90,9 +89,10 @@ public class EventServiceImpl implements EventService {
         updateEventAdmin(event, eventUpdatedDto);
         event = eventRepository.save(event);
         locationRepository.save(event.getLocation());
-        List<CommentDto> comments = getCommentsList(eventId);
+
+        Long comments = getComments(eventId);
         log.info("Update event with id= {} in admin ", eventId);
-        return mapToEventFullDto(event, comments);
+        return mapToEventFullDtoWithComments(event, comments);
     }
 
 
@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.save(mapToNewEvent(newEventDto, savedLocation, user, category));
         confirmedRequestsForOneEvent(event);
         log.info("User id= {} create event in admin", userId);
-        return mapToEventFullDto(event, Collections.emptyList());
+        return mapToEventFullDto(event);
     }
 
     @Transactional(readOnly = true)
@@ -128,9 +128,9 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventByIdPrivate(Long userId, Long eventId) {
         Event event = getEventByIdAndInitiatorId(eventId, userId);
         confirmedRequestsForOneEvent(event);
-        List<CommentDto> comments = getCommentsList(eventId);
+        Long comments = getComments(eventId);
         log.info("Get event with id={} of user with id= {} in private", eventId, userId);
-        return mapToEventFullDto(event, comments);
+        return mapToEventFullDtoWithComments(event, comments);
     }
 
     @Override
@@ -142,9 +142,9 @@ public class EventServiceImpl implements EventService {
         updateEvent(event, eventUpdatedDto);
         Event eventSaved = eventRepository.save(event);
         locationRepository.save(eventSaved.getLocation());
-        List<CommentDto> comments = getCommentsList(eventId);
+        Long comments = getComments(eventId);
         log.info("Update event with id={} of user with id= {} in private", eventId, userId);
-        return mapToEventFullDto(eventSaved, comments);
+        return mapToEventFullDtoWithComments(eventSaved, comments);
     }
 
     public List<EventShortDto> getEventsPublic(String text,
@@ -206,8 +206,8 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(PUBLISHED)) {
             throw new NotFoundException("Event with id=" + id + " hasn't not published");
         }
-        List<CommentDto> comments = getCommentsList(id);
-        EventFullDto fullDto = mapToEventFullDto(event, comments);
+        Long comments = getComments(id);
+        EventFullDto fullDto = mapToEventFullDtoWithComments(event, comments);
 
         List<String> uris = List.of("/events/" + event.getId());
         List<ViewStatsDto> views = statsClient.getStats(START_DATE, END_DATE, uris, null).getBody();
@@ -221,24 +221,27 @@ public class EventServiceImpl implements EventService {
         return fullDto;
     }
 
-
-    private List<CommentDto> getCommentsList(Long eventId) {
-        return commentRepository.findAllByEventId(eventId).stream()
-                .map(CommentMapper::mapToCommentDto)
-                .collect(Collectors.toList());
+    private Long getComments(Long eventId) {
+        return commentRepository.countCommentByEventId(eventId);
     }
 
     private List<EventFullDto> getEventsWithComments(List<Event> events) {
         Map<Long, Event> eventsMap = events.stream()
                 .collect(Collectors.toMap(Event::getId, Function.identity()));
-        Map<Long, List<CommentDto>> comments = commentRepository.findByEventIdIn(eventsMap.keySet()).stream()
-                .map(CommentMapper::mapToCommentDto)
-                .collect(Collectors.groupingBy(CommentDto::getEventId));
-        return eventsMap.values()
-                .stream()
-                .map(event -> mapToEventFullDto(
-                        event,
-                        comments.getOrDefault(event.getId(), Collections.emptyList())))
+        Map<Long, Integer> commentCounts = new HashMap<>();
+        Set<Long> eventIds = eventsMap.keySet();
+
+        List<Comment> commentList = commentRepository.findByEventIdIn(eventIds);
+        commentList.forEach(comment -> {
+            Long eventId = comment.getEvent().getId();
+            int count = commentCounts.getOrDefault(eventId, 0);
+            commentCounts.put(eventId, count + 1);
+        });
+
+        return eventsMap.values().stream()
+                .map(event -> {long commentCount = commentCounts.getOrDefault(event.getId(), 0);
+                    return mapToEventFullDtoWithComments(event, commentCount);
+                })
                 .collect(Collectors.toList());
     }
 

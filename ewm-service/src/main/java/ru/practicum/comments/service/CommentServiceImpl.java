@@ -18,6 +18,7 @@ import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 import ru.practicum.util.Pagination;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,11 +58,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentDto updateCommentByIdPrivate(Long userId, Long commentId, CommentDto commentDto) {
+    public CommentDto updateCommentByIdPrivate(Long userId, Long commentId, NewCommentDto newCommentDto) {
+        CommentDto commentDto = CommentMapper.mapToComment(newCommentDto);
         Comment comment = commentRepository.findByIdAndAuthorId(commentId, userId)
                 .orElseThrow(() -> new NotFoundException("Comment with id=" + commentId + " hasn't found."));
 
         comment.setText(commentDto.getText());
+        comment.setUpdated(LocalDateTime.now());
 
         log.info("Update comment of user with id= {}", userId);
         return mapToCommentDto(commentRepository.save(comment));
@@ -121,20 +124,22 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateCommentAdmin(Long commentId, CommentDto commentDto) {
+    public CommentDto updateCommentAdmin(Long commentId, NewCommentDto newCommentDto) {
+        CommentDto commentDto = CommentMapper.mapToComment(newCommentDto);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment with id=" + commentId + " hasn't  found."));
         comment.setText(commentDto.getText());
+        comment.setUpdated(LocalDateTime.now());
 
         log.info("Update comment {} with  id={} on admin part", commentDto, commentId);
         return mapToCommentDto(commentRepository.save(comment));
     }
 
     @Override
-    public List<CommentDto> getCommentsPublic(String text, Integer from, Integer size) {
+    public List<CommentDto> getCommentsPublic(Long eventId, String text, Integer from, Integer size) {
         log.info("Get comment for event with text= {}", text);
 
-        return commentRepository.findAllByText(text, new Pagination(from, size, Sort.unsorted())).stream()
+        return commentRepository.findAllEventIdAndByText(eventId, text, new Pagination(from, size, Sort.unsorted())).stream()
                 .map(CommentMapper::mapToCommentDto)
                 .collect(Collectors.toList());
     }

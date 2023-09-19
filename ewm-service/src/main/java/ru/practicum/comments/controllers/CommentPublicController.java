@@ -23,7 +23,8 @@ public class CommentPublicController {
     private final CommentService commentService;
 
     @GetMapping
-    public List<CommentDto> getByTextPublic(@RequestParam(required = false) String text,
+    public List<CommentDto> getByTextPublic(@RequestParam(value = "eventId") Long eventId,
+                                            @RequestParam(required = false) String text,
                                             @RequestParam(defaultValue = PAGE_DEFAULT_FROM)
                                             @PositiveOrZero Integer from,
                                             @RequestParam(defaultValue = PAGE_DEFAULT_SIZE)
@@ -31,7 +32,7 @@ public class CommentPublicController {
     ) {
 
         log.info("Get public comments with text {}", text);
-        return commentService.getCommentsPublic(text, from, size);
+        return commentService.getCommentsPublic(eventId, text, from, size);
     }
 
 }

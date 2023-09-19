@@ -3,9 +3,9 @@ package ru.practicum.comments.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comments.dto.CommentDto;
+import ru.practicum.comments.dto.NewCommentDto;
 import ru.practicum.comments.service.CommentService;
 
 import javax.validation.Valid;
@@ -13,7 +13,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/admin/comments")
 @RequiredArgsConstructor
-@Validated
 @Slf4j
 public class CommentAdminController {
 
@@ -29,9 +28,9 @@ public class CommentAdminController {
 
     @PatchMapping("/{commentId}")
     public CommentDto updateAdmin(@PathVariable(value = "commentId") Long commentId,
-                                  @Valid @RequestBody CommentDto commentDto) {
-        log.info("Update comment {} with id= {}", commentDto, commentId);
-        return commentService.updateCommentAdmin(commentId, commentDto);
+                                  @Valid @RequestBody NewCommentDto newCommentDto) {
+        log.info("Update comment {} with id= {}", newCommentDto, commentId);
+        return commentService.updateCommentAdmin(commentId, newCommentDto);
     }
 
     @DeleteMapping("/{commentId}")

@@ -3,12 +3,9 @@ package ru.practicum.events.dto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.category.model.Category;
-import ru.practicum.comments.dto.CommentDto;
 import ru.practicum.events.model.Event;
 import ru.practicum.locations.model.Location;
 import ru.practicum.users.model.User;
-
-import java.util.List;
 
 import static ru.practicum.category.dto.CategoryMapper.toCategoryDto;
 import static ru.practicum.locations.dto.LocationMapper.mapToLocationDto;
@@ -16,8 +13,32 @@ import static ru.practicum.users.dto.UserMapper.toUserShortDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
+    public static EventFullDto mapToEventFullDto(Event event) {
+        if (event == null) {
+            return null;
+        }
 
-    public static EventFullDto mapToEventFullDto(Event event, List<CommentDto> comments) {
+        return EventFullDto.builder()
+                .annotation(event.getAnnotation())
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .location(mapToLocationDto(event.getLocation()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .title(event.getTitle())
+                .state(event.getState())
+                .description(event.getDescription())
+                .category(toCategoryDto(event.getCategory()))
+                .createdOn(event.getCreatedOn())
+                .initiator(toUserShortDto(event.getInitiator()))
+                .requestModeration(event.getRequestModeration())
+                .publishedOn(event.getPublishedOn())
+                .build();
+    }
+
+
+    public static EventFullDto mapToEventFullDtoWithComments(Event event, Long comments) {
         if (event == null) {
             return null;
         }

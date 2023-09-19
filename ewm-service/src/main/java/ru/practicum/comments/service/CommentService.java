@@ -9,7 +9,7 @@ import java.util.List;
 public interface CommentService {
     CommentDto createCommentPrivate(Long userId, Long eventId, NewCommentDto newCommentDto);
 
-    CommentDto updateCommentByIdPrivate(Long userId, Long commentId, CommentDto dto);
+    CommentDto updateCommentByIdPrivate(Long userId, Long commentId, NewCommentDto newCommentDto);
 
     CommentDto getCommentByIdPrivate(Long userId, Long commentId);
 
@@ -21,10 +21,10 @@ public interface CommentService {
 
     CommentDto getCommentByIdAdmin(Long commentId);
 
-    CommentDto updateCommentAdmin(Long commentId, CommentDto commentDto);
+    CommentDto updateCommentAdmin(Long commentId, NewCommentDto newCommentDto);
 
     void deleteCommentByIdAdmin(Long commentId);
 
-    List<CommentDto> getCommentsPublic(String text, Integer from, Integer size);
+    List<CommentDto> getCommentsPublic(Long eventId, String text, Integer from, Integer size);
 
 }

@@ -40,4 +40,7 @@ public class Comment {
 
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime created = LocalDateTime.now();
+
+    @Column(name = "updated_date ", updatable = false)
+    private LocalDateTime updated;
 }

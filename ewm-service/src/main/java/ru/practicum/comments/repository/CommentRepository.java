@@ -13,8 +13,7 @@ import java.util.Set;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-
-    List<Comment> findAllByEventId(Long eventId);
+    Long countCommentByEventId(Long eventId);
 
     List<Comment> findAllByEventId(Long eventId, PageRequest pageable);
 
@@ -24,23 +23,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Optional<Comment> findByIdAndAuthorId(Long commentId, Long userId);
 
-
-    @Query("select c " +
-            "from Comment AS c " +
-            "JOIN FETCH c.event " +
-            "JOIN FETCH c.author " +
-            "where (:author is null or c.author.id in :author) " +
-            "and (:event is null or c.event.id in :event)"
-    )
-    List<Comment> findAllByAuthorIdOrEventId(Long author, Long event, PageRequest pageable);
-
     @Query("select c " +
             "from Comment c " +
             "JOIN FETCH c.event " +
             "JOIN FETCH c.author " +
-            "where (UPPER(c.text) LIKE UPPER(concat('%', :text, '%')))"
-
+            "where (c.event.id = :event) " +
+            "and (UPPER(c.text) LIKE UPPER(concat('%', :text, '%')))"
     )
-    List<Comment> findAllByText(@Param("text") String text, PageRequest pageable);
+    List<Comment> findAllEventIdAndByText(@Param("event") Long eventId, @Param("text") String text, PageRequest pageable);
 
 }

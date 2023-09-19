@@ -80,7 +80,7 @@ public class EventServiceImpl implements EventService {
         confirmedRequestForListEvent(events);
 
         log.info("Get all events in admin {}", events);
-        return getEventsWithComments(events);
+        return getEventsFullDtoWithComments(events);
     }
 
     @Override
@@ -117,10 +117,8 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findAllWithInitiatorByInitiatorId(userId, new Pagination(from, size,
                 Sort.unsorted()));
         confirmedRequestForListEvent(events);
+        return getEventShortDtoWithComments(events);
 
-        return events.stream()
-                .map(EventMapper::mapToEventShortDto)
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -225,7 +223,29 @@ public class EventServiceImpl implements EventService {
         return commentRepository.countCommentByEventId(eventId);
     }
 
-    private List<EventFullDto> getEventsWithComments(List<Event> events) {
+    private List<EventFullDto> getEventsFullDtoWithComments(List<Event> events) {
+        Map<Long, Event> eventsMap = events.stream()
+                .collect(Collectors.toMap(Event::getId, Function.identity()
+                ));
+        Map<Long, Integer> commentCounts = new HashMap<>();
+        Set<Long> eventIds = eventsMap.keySet();
+
+        List<Comment> commentList = commentRepository.findByEventIdIn(eventIds);
+        commentList.forEach(comment -> {
+            Long eventId = comment.getEvent().getId();
+            int count = commentCounts.getOrDefault(eventId, 0);
+            commentCounts.put(eventId, count + 1);
+        });
+
+        return eventsMap.values().stream()
+                .map(event -> {
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0);
+                    return mapToEventFullDtoWithComments(event, commentCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<EventShortDto> getEventShortDtoWithComments(List<Event> events) {
         Map<Long, Event> eventsMap = events.stream()
                 .collect(Collectors.toMap(Event::getId, Function.identity()));
         Map<Long, Integer> commentCounts = new HashMap<>();
@@ -241,7 +261,7 @@ public class EventServiceImpl implements EventService {
         return eventsMap.values().stream()
                 .map(event -> {
                     long commentCount = commentCounts.getOrDefault(event.getId(), 0);
-                    return mapToEventFullDtoWithComments(event, commentCount);
+                    return mapToEventShortDtoWithComments(event, commentCount);
                 })
                 .collect(Collectors.toList());
     }

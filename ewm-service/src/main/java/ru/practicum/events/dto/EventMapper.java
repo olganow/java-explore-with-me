@@ -63,6 +63,20 @@ public class EventMapper {
                 .build();
     }
 
+    public static EventShortDto mapToEventShortDtoWithComments(Event event, Long comments) {
+        return EventShortDto.builder()
+                .annotation(event.getAnnotation())
+                .category(toCategoryDto(event.getCategory()))
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .initiator(toUserShortDto(event.getInitiator()))
+                .paid(event.getPaid())
+                .title(event.getTitle())
+                .comments(comments)
+                .build();
+    }
+
     public static EventShortDto mapToEventShortDto(Event event) {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())

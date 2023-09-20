@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.practicum.comments.dto.CommentCountDto;
 import ru.practicum.comments.model.Comment;
 
 import java.util.List;
@@ -19,12 +20,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Page<Comment> findAllByAuthorId(Long userId, PageRequest pageable);
 
-    List<Comment> findByEventIdIn(Set<Long> longs);
+    @Query("SELECT new ru.practicum.comments.dto.CommentCountDto(c.event.id, COUNT(c.event.id)) " +
+            "FROM Comment c WHERE c.event.id IN :eventIdList GROUP BY c.event.id")
+    List<CommentCountDto> findCommentCountByEventIdList(@Param("eventIdList") Set<Long> eventIdList);
 
     Optional<Comment> findByIdAndAuthorId(Long commentId, Long userId);
 
-    @Query("select c " +
-            "from Comment c " +
+    @Query("SELECT c " +
+            "FROM Comment c " +
             "JOIN FETCH c.event " +
             "JOIN FETCH c.author " +
             "where (c.event.id = :event) " +

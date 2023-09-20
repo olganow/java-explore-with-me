@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.practicum.comments.dto.CommentCountDto;
 import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.dto.ViewStatsDto;
@@ -227,19 +228,13 @@ public class EventServiceImpl implements EventService {
         Map<Long, Event> eventsMap = events.stream()
                 .collect(Collectors.toMap(Event::getId, Function.identity()
                 ));
-        Map<Long, Integer> commentCounts = new HashMap<>();
         Set<Long> eventIds = eventsMap.keySet();
-
-        List<Comment> commentList = commentRepository.findByEventIdIn(eventIds);
-        commentList.forEach(comment -> {
-            Long eventId = comment.getEvent().getId();
-            int count = commentCounts.getOrDefault(eventId, 0);
-            commentCounts.put(eventId, count + 1);
-        });
+        Map<Long, Long> commentCounts = commentRepository.findCommentCountByEventIdList(eventIds).stream()
+                .collect(Collectors.toMap(CommentCountDto::getEventId, CommentCountDto::getCount));
 
         return eventsMap.values().stream()
                 .map(event -> {
-                    long commentCount = commentCounts.getOrDefault(event.getId(), 0);
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0L);
                     return mapToEventFullDtoWithComments(event, commentCount);
                 })
                 .collect(Collectors.toList());
@@ -248,19 +243,13 @@ public class EventServiceImpl implements EventService {
     private List<EventShortDto> getEventShortDtoWithComments(List<Event> events) {
         Map<Long, Event> eventsMap = events.stream()
                 .collect(Collectors.toMap(Event::getId, Function.identity()));
-        Map<Long, Integer> commentCounts = new HashMap<>();
         Set<Long> eventIds = eventsMap.keySet();
-
-        List<Comment> commentList = commentRepository.findByEventIdIn(eventIds);
-        commentList.forEach(comment -> {
-            Long eventId = comment.getEvent().getId();
-            int count = commentCounts.getOrDefault(eventId, 0);
-            commentCounts.put(eventId, count + 1);
-        });
+        Map<Long, Long> commentCounts = commentRepository.findCommentCountByEventIdList(eventIds).stream()
+                .collect(Collectors.toMap(CommentCountDto::getEventId, CommentCountDto::getCount));
 
         return eventsMap.values().stream()
                 .map(event -> {
-                    long commentCount = commentCounts.getOrDefault(event.getId(), 0);
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0L);
                     return mapToEventShortDtoWithComments(event, commentCount);
                 })
                 .collect(Collectors.toList());

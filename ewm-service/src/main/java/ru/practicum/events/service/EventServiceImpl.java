@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.practicum.comments.dto.CommentCountDto;
-import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.locations.model.Location;

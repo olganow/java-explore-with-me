@@ -54,4 +54,6 @@ public class EventFullDto {
 
     private UserShortDto initiator;
 
+    private long comments;
+
 }

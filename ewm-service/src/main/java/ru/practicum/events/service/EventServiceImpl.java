@@ -9,6 +9,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.practicum.comments.dto.CommentCountDto;
+import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.locations.model.Location;
 import ru.practicum.locations.repository.LocationRepository;
@@ -34,15 +36,16 @@ import ru.practicum.users.repository.UserRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ru.practicum.events.dto.EventMapper.*;
+import static ru.practicum.events.dto.EventMapper.mapToEventFullDtoWithComments;
 import static ru.practicum.locations.dto.LocationMapper.mapToLocation;
 import static ru.practicum.util.enam.EventsSort.EVENT_DATE;
 import static ru.practicum.util.enam.EventsSort.VIEWS;
 import static ru.practicum.util.Constants.*;
 import static ru.practicum.util.enam.EventState.*;
-import static ru.practicum.events.dto.EventMapper.mapToEventFullDto;
-import static ru.practicum.events.dto.EventMapper.mapToNewEvent;
 
 @Service
 @Slf4j
@@ -59,6 +62,7 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<EventFullDto> getAllEventsAdmin(List<Long> users,
@@ -76,9 +80,7 @@ public class EventServiceImpl implements EventService {
         confirmedRequestForListEvent(events);
 
         log.info("Get all events in admin {}", events);
-        return events.stream()
-                .map(EventMapper::mapToEventFullDto)
-                .collect(Collectors.toList());
+        return getEventsFullDtoWithComments(events);
     }
 
     @Override
@@ -87,8 +89,10 @@ public class EventServiceImpl implements EventService {
         updateEventAdmin(event, eventUpdatedDto);
         event = eventRepository.save(event);
         locationRepository.save(event.getLocation());
+
+        Long comments = getComments(eventId);
         log.info("Update event with id= {} in admin ", eventId);
-        return mapToEventFullDto(event);
+        return mapToEventFullDtoWithComments(event, comments);
     }
 
 
@@ -113,10 +117,8 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findAllWithInitiatorByInitiatorId(userId, new Pagination(from, size,
                 Sort.unsorted()));
         confirmedRequestForListEvent(events);
+        return getEventShortDtoWithComments(events);
 
-        return events.stream()
-                .map(EventMapper::mapToEventShortDto)
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -124,8 +126,9 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventByIdPrivate(Long userId, Long eventId) {
         Event event = getEventByIdAndInitiatorId(eventId, userId);
         confirmedRequestsForOneEvent(event);
+        Long comments = getComments(eventId);
         log.info("Get event with id={} of user with id= {} in private", eventId, userId);
-        return mapToEventFullDto(event);
+        return mapToEventFullDtoWithComments(event, comments);
     }
 
     @Override
@@ -137,8 +140,9 @@ public class EventServiceImpl implements EventService {
         updateEvent(event, eventUpdatedDto);
         Event eventSaved = eventRepository.save(event);
         locationRepository.save(eventSaved.getLocation());
+        Long comments = getComments(eventId);
         log.info("Update event with id={} of user with id= {} in private", eventId, userId);
-        return mapToEventFullDto(eventSaved);
+        return mapToEventFullDtoWithComments(eventSaved, comments);
     }
 
     public List<EventShortDto> getEventsPublic(String text,
@@ -200,7 +204,8 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(PUBLISHED)) {
             throw new NotFoundException("Event with id=" + id + " hasn't not published");
         }
-        EventFullDto fullDto = mapToEventFullDto(event);
+        Long comments = getComments(id);
+        EventFullDto fullDto = mapToEventFullDtoWithComments(event, comments);
 
         List<String> uris = List.of("/events/" + event.getId());
         List<ViewStatsDto> views = statsClient.getStats(START_DATE, END_DATE, uris, null).getBody();
@@ -214,6 +219,40 @@ public class EventServiceImpl implements EventService {
         return fullDto;
     }
 
+    private Long getComments(Long eventId) {
+        return commentRepository.countCommentByEventId(eventId);
+    }
+
+    private List<EventFullDto> getEventsFullDtoWithComments(List<Event> events) {
+        Map<Long, Event> eventsMap = events.stream()
+                .collect(Collectors.toMap(Event::getId, Function.identity()
+                ));
+        Set<Long> eventIds = eventsMap.keySet();
+        Map<Long, Long> commentCounts = commentRepository.findCommentCountByEventIdList(eventIds).stream()
+                .collect(Collectors.toMap(CommentCountDto::getEventId, CommentCountDto::getCount));
+
+        return eventsMap.values().stream()
+                .map(event -> {
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0L);
+                    return mapToEventFullDtoWithComments(event, commentCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<EventShortDto> getEventShortDtoWithComments(List<Event> events) {
+        Map<Long, Event> eventsMap = events.stream()
+                .collect(Collectors.toMap(Event::getId, Function.identity()));
+        Set<Long> eventIds = eventsMap.keySet();
+        Map<Long, Long> commentCounts = commentRepository.findCommentCountByEventIdList(eventIds).stream()
+                .collect(Collectors.toMap(CommentCountDto::getEventId, CommentCountDto::getCount));
+
+        return eventsMap.values().stream()
+                .map(event -> {
+                    long commentCount = commentCounts.getOrDefault(event.getId(), 0L);
+                    return mapToEventShortDtoWithComments(event, commentCount);
+                })
+                .collect(Collectors.toList());
+    }
 
     private Category getCategoryForEvent(Long id) {
         return categoryRepository.findById(id)

@@ -13,7 +13,6 @@ import static ru.practicum.users.dto.UserMapper.toUserShortDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
-
     public static EventFullDto mapToEventFullDto(Event event) {
         if (event == null) {
             return null;
@@ -35,6 +34,46 @@ public class EventMapper {
                 .initiator(toUserShortDto(event.getInitiator()))
                 .requestModeration(event.getRequestModeration())
                 .publishedOn(event.getPublishedOn())
+                .build();
+    }
+
+
+    public static EventFullDto mapToEventFullDtoWithComments(Event event, Long comments) {
+        if (event == null) {
+            return null;
+        }
+
+        return EventFullDto.builder()
+                .annotation(event.getAnnotation())
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .location(mapToLocationDto(event.getLocation()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .title(event.getTitle())
+                .state(event.getState())
+                .description(event.getDescription())
+                .category(toCategoryDto(event.getCategory()))
+                .createdOn(event.getCreatedOn())
+                .initiator(toUserShortDto(event.getInitiator()))
+                .requestModeration(event.getRequestModeration())
+                .publishedOn(event.getPublishedOn())
+                .comments(comments)
+                .build();
+    }
+
+    public static EventShortDto mapToEventShortDtoWithComments(Event event, Long comments) {
+        return EventShortDto.builder()
+                .annotation(event.getAnnotation())
+                .category(toCategoryDto(event.getCategory()))
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .initiator(toUserShortDto(event.getInitiator()))
+                .paid(event.getPaid())
+                .title(event.getTitle())
+                .comments(comments)
                 .build();
     }
 
